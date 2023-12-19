@@ -1,6 +1,7 @@
 import torch
 from torch import nn as nn
 import torch.nn.functional as F
+import types, typing
 from typing import Callable
 
 ## The first dude uses weight tying therefore a bit cheaper. 
@@ -82,3 +83,7 @@ class auto_encoder(nn.Module):
                 x = self.activation(x)
             x = layer(x)
         return x
+
+
+if __name__== "__main__":
+    pass
