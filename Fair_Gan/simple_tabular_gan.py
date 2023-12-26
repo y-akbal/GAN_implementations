@@ -9,6 +9,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
+
 @dataclass
 class training_setup:
     z_dim: str
@@ -102,9 +103,9 @@ def train(setup: dataclass,
         ### Train Discriminator: max log(D(x)) + log(1 - D(G(z)))
             noise = torch.randn(batch_size, z_dim).to(device)
             fake = generator(noise)
-            disc_real = discriminator(real).view(-1)
+            disc_real = discriminator(real)
             lossD_real = loss_fn(disc_real, torch.ones_like(disc_real))
-            disc_fake = discriminator(fake).view(-1)
+            disc_fake = discriminator(fake)
             lossD_fake = loss_fn(disc_fake, torch.zeros_like(disc_fake))
             lossD = (lossD_real + lossD_fake) / 2
             discriminator.zero_grad()
@@ -130,6 +131,7 @@ def train(setup: dataclass,
                 fake = generator(fixed_noise)
                 ### do your magic here!!!!
                 ### logging some loss or something maybe some comparison would be good!!! 
+                ### things like AE would be good for projection to two dimensional space.
     try:
         torch.save(generator.cpu(), "generator_weights.w")
         print("Generator saved!!!!")
