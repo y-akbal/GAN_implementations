@@ -67,25 +67,19 @@ def prepare_data(setup: dataclass,
                 categorical_features:list[int]):
     pd_data = pd.read_csv(setup.data_dir)
     ## Do some preprocessing here!!!
+    ## Normalize the data --- convert to tensor---
+    ## May wish to use the collating function 
     return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-transforms = transforms.Compose(
-    [
-        transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,)),
-    ]
-)
+def train():
+    ##Here training will happen here, and we will save the model at the end
+    return None
 
 
-
-dataset = datasets.MNIST(root="dataset/", transform=transforms, download=True)
 loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 opt_disc = optim.Adam(disc.parameters(), lr=lr)
 opt_gen = optim.Adam(gen.parameters(), lr=lr)
 criterion = nn.BCELoss()
-writer_fake = SummaryWriter(f"logs/fake")
-writer_real = SummaryWriter(f"logs/real")
-step = 0
 
 for epoch in range(num_epochs):
     for batch_idx, (real, _) in enumerate(loader):
