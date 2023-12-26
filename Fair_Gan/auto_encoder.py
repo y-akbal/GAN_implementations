@@ -51,7 +51,7 @@ class auto_encoder_bb(nn.Module):
             return enc_output
         return self.__decoder__(enc_output)
 
-## This dude is a bit slopy...
+## This dude is a bit sloppy...
 class auto_encoder(nn.Module):
     def __init__(self, 
                  dims:list[int], 
