@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import tqdm as tqdm
 import torch
+import os
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import transforms
@@ -12,10 +13,10 @@ from sklearn.model_selection import train_test_split
 
 @dataclass
 class training_setup:
-    z_dim: str
-    latent_dim: float
-    num_features:int
-    data_set: str  
+    z_dim: int  = 128
+    latent_dim: int = 256
+    num_features:int = 10
+    data_set: str  = os.path.join("datasets", "dataset.csv")
     lr:float = 1e-4
     device:str = "cuda" if torch.cuda.is_available() else "cpu"
     batch_size:int = 32 
@@ -145,4 +146,5 @@ def main():
     return None
 
 if __name__ == "__main__":
+    
     main()
