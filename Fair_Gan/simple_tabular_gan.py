@@ -59,7 +59,6 @@ def return_disc_gen(setup:dataclass = training_setup(10, 10, 10, "w")):
     ## Disc and gen, 
     disc = Discriminator(num_features).to(device)
     gen = Generator(z_dim, num_features).to(device)
-
     return disc, gen
 
 def prepare_data(setup: dataclass, 
@@ -69,6 +68,7 @@ def prepare_data(setup: dataclass,
     data = pd.read_csv(setup.data_dir)
     data_x = data.iloc[:, numerical_features].to_numpy()  #RxF -- Rows x Features -> numpy_array
     data_y = data.iloc[:, categorical_features].to_numpy()
+
     normalized_data_x = (data_x - data_x.min(axis = 1))/(data_x.max(axis = 1) - data_x.min(axis = 1))
     if split:
         return train_test_split((normalized_data_x, data_y)) ## train_x, train_y, test_x, test_y splitted
