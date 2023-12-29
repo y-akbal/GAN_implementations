@@ -124,7 +124,7 @@ def train(setup: dataclass,
 
             if batch_idx == 0:
                  print(
-                     f"Epoch [{epoch}/{num_epochs}] Batch {batch_idx}/{len(loader)} \
+                     f"Epoch [{epoch}/{num_epochs}] Batch {batch_idx}/{len(training_data)} \
                      Loss D: {lossD:.4f}, loss G: {lossG:.4f}"
                      )
 

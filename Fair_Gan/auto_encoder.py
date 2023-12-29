@@ -45,11 +45,27 @@ class auto_encoder_bb(nn.Module):
 
     def forward(self, 
                 x:torch.Tensor, 
-                encoder_output:bool = False)->torch.Tensor:
+                encoder_output:bool = False
+                )->torch.Tensor:
         enc_output = self.__encoder__(x)
         if encoder_output:
             return enc_output
         return self.__decoder__(enc_output)
+
+"""  Loss will be included in a different function"""
+"""
+def loss(x:torch.Tensor, y:torch.Tensor)->torch.Tensor:
+    x[:, 1:3].softmax(-1), x[:, 3:7].softmax(-1)
+    loss_1 = nn.C
+    return final_loss
+"""
+### Roadmap
+### 1) Custom loss function depending on different datasets!!!
+### 2) Comparison between two samples (distance between two distributions!!!)
+### 3) 
+
+
+
 
 ## This dude is a bit sloppy...
 class auto_encoder(nn.Module):
