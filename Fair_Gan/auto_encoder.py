@@ -2,7 +2,7 @@ import torch
 from torch import nn as nn
 import torch.nn.functional as F
 import types, typing
-from typing import Callable
+from collections.abc import Callable, Awaitable
 
 """
 torch.manual_seed(0)
@@ -63,16 +63,20 @@ class auto_encoder_bb(nn.Module):
         return self.__decoder__(enc_output)
 
 
-def loss(numerical_columns:list, categorical_columns:list, class_sizes:list)->Callable:
+def loss(numerical_columns:list, 
+         categorical_columns:list, 
+         class_sizes:list)->Callable[[torch.Tensor, torch.Tensor]]:
 
     @torch.compile    
-    def temp_loss(X, y):
+    def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
+        
         loss = nn.MSELoss()(X[:, numerical_columns], y[:, numerical_columns])
         for i, num_class in zip(categorical_columns, class_sizes):
             loss += F.cross_entropy(X[:, i:i+num_class], y[:, i:i+num_class])
         return loss
 
     return temp_loss
+
 """
 torch.manual_seed(0)
 loss([0,1,2], [3,3],[3,3])(torch.randn(1, 9), torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.1, 0.0]], dtype = torch.float32))
