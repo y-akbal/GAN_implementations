@@ -66,21 +66,27 @@ class auto_encoder_bb(nn.Module):
 
 def loss(numerical_columns:list, 
          categorical_columns:list, 
-         class_sizes:list)->Callable[[torch.Tensor, torch.Tensor],torch.Tensor]:
-
-    @torch.compile    
-    def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
+         class_sizes:list, class_indices = False)->Callable[[torch.Tensor, torch.Tensor],torch.Tensor]:
+    if not class_indices:
+        @torch.compile
+        def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
         
-        loss = nn.MSELoss()(X[:, numerical_columns], y[:, numerical_columns])
-        for i, num_class in zip(categorical_columns, class_sizes):
-            loss += F.cross_entropy(X[:, i:i+num_class], y[:, i:i+num_class])
-        return loss
+            loss = nn.MSELoss()(X[:, numerical_columns], y[:, numerical_columns])
+            for i, num_class in zip(categorical_columns, class_sizes):
+                loss += F.cross_entropy(X[:, i:i+num_class], y[:, i:i+num_class])
+            return loss
+        return temp_loss
+    else:
+        ## This part is to be written (not ready) 
+        @torch.compile
+        def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
+            pass
+        return temp_loss
 
-    return temp_loss
 
 """
 torch.manual_seed(1)
-loss([0,1,2], [3,6],[3,3])(torch.randn(1, 9), torch.tensor([[1.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.1, 0.0]], dtype = torch.float32))
+loss([0,1,2], [3,5],[2,2])(torch.tensor([[9.0, 0.0, 0.0, 10.0, -10.0, 10.99, -0.01]]), torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]]))
 """
 
 
