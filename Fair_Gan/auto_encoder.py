@@ -63,9 +63,10 @@ class auto_encoder_bb(nn.Module):
         return self.__decoder__(enc_output)
 
 
+
 def loss(numerical_columns:list, 
          categorical_columns:list, 
-         class_sizes:list)->Callable[[torch.Tensor, torch.Tensor]]:
+         class_sizes:list)->Callable[[torch.Tensor, torch.Tensor],torch.Tensor]:
 
     @torch.compile    
     def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
@@ -78,8 +79,8 @@ def loss(numerical_columns:list,
     return temp_loss
 
 """
-torch.manual_seed(0)
-loss([0,1,2], [3,3],[3,3])(torch.randn(1, 9), torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.1, 0.0]], dtype = torch.float32))
+torch.manual_seed(1)
+loss([0,1,2], [3,6],[3,3])(torch.randn(1, 9), torch.tensor([[1.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.1, 0.0]], dtype = torch.float32))
 """
 
 
