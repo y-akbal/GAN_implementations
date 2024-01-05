@@ -63,31 +63,27 @@ class auto_encoder_bb(nn.Module):
         return self.__decoder__(enc_output)
 
 
-
-def loss(numerical_columns:list, 
-         categorical_columns:list, 
-         class_sizes:list, class_indices = False)->Callable[[torch.Tensor, torch.Tensor],torch.Tensor]:
-    if not class_indices:
-        @torch.compile
-        def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
+def loss(numerical_columns:list[int], 
+         binary_columns:list[int],
+         categorical_columns:list[tuple[float,float]]
+         )->Callable[[torch.Tensor, torch.Tensor],torch.Tensor]:
         
+        #@torch.compile ## since we have a lot of for loops compiling may save some time!!!
+        def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
             loss = nn.MSELoss()(X[:, numerical_columns], y[:, numerical_columns])
-            for i, num_class in zip(categorical_columns, class_sizes):
-                loss += F.cross_entropy(X[:, i:i+num_class], y[:, i:i+num_class])
+            for feature in categorical_columns:
+                i, class_size = feature
+                loss += F.cross_entropy(X[:, i:i+class_size], y[:, i:i+class_size])
+            for i in binary_columns:
+                loss += F.binary_cross_entropy_with_logits(X[:, i], y[:, i])               
             return loss
         return temp_loss
-    else:
-        ## This part is to be written (not ready) 
-        @torch.compile
-        def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
-            pass
-        return temp_loss
 
 
-"""
 torch.manual_seed(1)
-loss([0,1,2], [3,5],[2,2])(torch.tensor([[9.0, 0.0, 0.0, 10.0, -10.0, 10.99, -0.01]]), torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]]))
-"""
+loss([0,1,2], [5],[(3,3)])(torch.tensor([[0.0, 0.0, 0.0, 10.0, -10.0, 0.0, 1.0]]).cuda(), 
+                           torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]]).cuda())
+
 
 
 
