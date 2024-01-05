@@ -4,6 +4,16 @@ import torch.nn.functional as F
 import types, typing
 from typing import Callable
 
+"""
+torch.manual_seed(0)
+logits = torch.randn(1, 10)
+x = logits.softmax(-1)
+-x.log()
+nn.CrossEntropyLoss()(logits, torch.tensor([1]))
+2.84 == 2.84
+F.one_hot(torch.tensor([1,2,10]), 11)
+"""
+
 ## The first dude uses weight tying therefore a bit cheaper. 
 class auto_encoder_bb(nn.Module):
     def __init__(self, 
@@ -52,13 +62,24 @@ class auto_encoder_bb(nn.Module):
             return enc_output
         return self.__decoder__(enc_output)
 
-"""  Loss will be included in a different function"""
+
+def loss(numerical_columns:list, categorical_columns:list, class_sizes:list)->Callable:
+
+    @torch.compile    
+    def temp_loss(X, y):
+        loss = nn.MSELoss()(X[:, numerical_columns], y[:, numerical_columns])
+        for i, num_class in zip(categorical_columns, class_sizes):
+            loss += F.cross_entropy(X[:, i:i+num_class], y[:, i:i+num_class])
+        return loss
+
+    return temp_loss
 """
-def loss(x:torch.Tensor, y:torch.Tensor)->torch.Tensor:
-    x[:, 1:3].softmax(-1), x[:, 3:7].softmax(-1)
-    loss_1 = nn.C
-    return final_loss
+torch.manual_seed(0)
+loss([0,1,2], [3,3],[3,3])(torch.randn(1, 9), torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.1, 0.0]], dtype = torch.float32))
 """
+
+
+
 ### Roadmap
 ### 1) Custom loss function depending on different datasets!!!
 ### 2) Comparison between two samples (distance between two distributions!!!)
