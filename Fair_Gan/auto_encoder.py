@@ -2,7 +2,17 @@ import torch
 from torch import nn as nn
 import torch.nn.functional as F
 import types, typing
-from typing import Callable
+from collections.abc import Callable, Awaitable
+
+"""
+torch.manual_seed(0)
+logits = torch.randn(1, 10)
+x = logits.softmax(-1)
+-x.log()
+nn.CrossEntropyLoss()(logits, torch.tensor([1]))
+2.84 == 2.84
+F.one_hot(torch.tensor([1,2,10]), 11)
+"""
 
 ## The first dude uses weight tying therefore a bit cheaper. 
 class auto_encoder_bb(nn.Module):
@@ -45,11 +55,45 @@ class auto_encoder_bb(nn.Module):
 
     def forward(self, 
                 x:torch.Tensor, 
-                encoder_output:bool = False)->torch.Tensor:
+                encoder_output:bool = False
+                )->torch.Tensor:
         enc_output = self.__encoder__(x)
         if encoder_output:
             return enc_output
         return self.__decoder__(enc_output)
+
+
+def loss(numerical_columns:list[int], 
+         binary_columns:list[int],
+         categorical_columns:list[tuple[float,float]]
+         )->Callable[[torch.Tensor, torch.Tensor],torch.Tensor]:
+        
+        #@torch.compile ## since we have a lot of for loops compiling may save some time!!!
+        def temp_loss(X:torch.Tensor, y:torch.Tensor)->torch.Tensor:
+            loss = nn.MSELoss()(X[:, numerical_columns], y[:, numerical_columns])
+            for feature in categorical_columns:
+                i, class_size = feature
+                loss += F.cross_entropy(X[:, i:i+class_size], y[:, i:i+class_size])
+            for i in binary_columns:
+                loss += F.binary_cross_entropy_with_logits(X[:, i], y[:, i])               
+            return loss
+        return temp_loss
+
+
+torch.manual_seed(1)
+loss([0,1,2], [5],[(3,3)])(torch.tensor([[0.0, 0.0, 0.0, 10.0, -10.0, 0.0, 1.0]]).cuda(), 
+                           torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]]).cuda())
+
+
+
+
+### Roadmap
+### 1) Custom loss function depending on different datasets!!!
+### 2) Comparison between two samples (distance between two distributions!!!)
+### 3) 
+
+
+
 
 ## This dude is a bit sloppy...
 class auto_encoder(nn.Module):
