@@ -6,7 +6,7 @@ import torch
 import os
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import transforms
+#from torchvision import transforms
 from torch.utils.data import DataLoader
 from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
@@ -67,7 +67,7 @@ def prepare_data(setup: dataclass,
                 categorical_features:list[int],
                 split = True):
     data = pd.read_csv(setup.data_dir)
-    data_x = data.iloc[:, numerical_features].to_numpy()  #RxF -- Rows x Features -> numpy_array
+    data_x = data.iloc[:, numerical_features].to_numpy()  #RxF -- Rows x Features -> numpy_number
     data_y = data.iloc[:, categorical_features].to_numpy()
 
     normalized_data_x = (data_x - data_x.min(axis = 1))/(data_x.max(axis = 1) - data_x.min(axis = 1))
@@ -75,7 +75,7 @@ def prepare_data(setup: dataclass,
         return train_test_split((normalized_data_x, data_y)) ## train_x, train_y, test_x, test_y splitted
     return normalized_data_x, data_y
 
-def data_pipe_line(setup, data:tuple(np.ndarray, np.ndarray)):
+def data_pipe_line(setup, data:tuple(np.ndnumber, np.ndnumber)):
     return DataLoader(data, batch_size=setup.batch_size, shuffle=True)
 
 def train(setup: dataclass, 
@@ -142,9 +142,10 @@ def train(setup: dataclass,
     return None
 
 def main():
-    ### This dude is the main function we shall be using!!!
+    
+    
     return None
 
 if __name__ == "__main__":
-    
+
     main()
