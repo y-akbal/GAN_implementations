@@ -41,16 +41,17 @@ class auto_encoder_bb(nn.Module):
     def __encoder__(self, x:torch.Tensor)->torch.Tensor:
         for i, (weight, bias) in enumerate(zip(self.weights, self.encoder_bias)):
             x = F.linear(x, weight, bias)
-            if i < self.depth -1:
+            if i < self.depth - 2:
                 x = self.activation(x)
         return x
     def __decoder__(self, x:torch.Tensor)->torch.Tensor:
         reversed_weights = reversed(self.weights)
         reversed_bias = reversed(self.decoder_bias)
         for i, (weight, bias) in enumerate(zip(reversed_weights, reversed_bias)):
-            if i < self.depth -1:
-                x = self.activation(x)
             x = F.linear(x, weight.T, bias)
+            if i < self.depth - 2:
+                x = self.activation(x)
+
         return x
 
     def forward(self, 
@@ -78,8 +79,11 @@ def loss(numerical_columns:list[int],
                 loss += F.binary_cross_entropy_with_logits(X[:, i], y[:, i])               
             return loss
         return temp_loss
-
 """
+auto_encoder_bb([20, 20, 2])(torch.randn(1, 20))
+"""
+"""
+
 torch.manual_seed(1)
 loss([0,1,2], [5],[(3,3)])(torch.tensor([[0.0, 0.0, 0.0, 10.0, -10.0, 0.0, 1.0]]).cuda(), 
                            torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]]).cuda())
@@ -116,16 +120,20 @@ class auto_encoder(nn.Module):
     def forward(self, x:torch.Tensor, encoder_output = False):
         for i, layer in enumerate(self.encoder):
             x = layer(x)
-            if i < self.depth -1:
+            if i < self.depth - 2:
+                # Assume that dims = [20, 10, 5]
+                # len(dims) = 3
+                # 3 -2
                 x = self.activation(x)
         
         if encoder_output:
             return x
 
         for i, layer in enumerate(self.decoder):
-            if i < self.depth -1:
-                x = self.activation(x)
             x = layer(x)
+
+            if i < self.depth - 2:
+                x = self.activation(x)
         return x
 
 
