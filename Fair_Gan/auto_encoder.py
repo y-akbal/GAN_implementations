@@ -79,11 +79,11 @@ def loss(numerical_columns:list[int],
             return loss
         return temp_loss
 
-
+"""
 torch.manual_seed(1)
 loss([0,1,2], [5],[(3,3)])(torch.tensor([[0.0, 0.0, 0.0, 10.0, -10.0, 0.0, 1.0]]).cuda(), 
                            torch.tensor([[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]]).cuda())
-
+"""
 
 
 
