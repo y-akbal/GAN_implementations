@@ -51,8 +51,22 @@ class auto_encoder_bb(nn.Module):
             x = F.linear(x, weight.T, bias)
             if i < self.depth - 2:
                 x = self.activation(x)
-
         return x
+    
+    def freeze(self):
+        #Since the weights are tied, we can not directly freeze the weights
+        # biases are not shared. 
+        for param in self.__decoder__.parameters:
+            param.requires_grad = False
+        for param in self.__encoder__.parameters:
+            param.requires_grad = False
+        
+    def unfreeze(self):
+        for param in self.__decoder__.parameters:
+            param.requires_grad = True
+        for param in self.__encoder__.parameters:
+            param.requires_grad = True
+            
 
     def forward(self, 
                 x:torch.Tensor, 
@@ -80,7 +94,9 @@ def loss(numerical_columns:list[int],
             return loss
         return temp_loss
 """
-auto_encoder_bb([20, 20, 2])(torch.randn(1, 20))
+
+auto_encoder_bb([20, 20, 2])(torch.randn(5, 20)).mean()
+
 """
 """
 
